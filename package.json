@@ -1,0 +1,14 @@
+{
+  "name": "railway-ai-assistant",
+  "version": "1.0.0",
+  "description": "Railway AI Assistant built with React, Tailwind CSS, Express, AI, and official MCP SDK",
+  "type": "module",
+  "scripts": {
+    "install:all": "npm --prefix backend install && npm --prefix frontend install",
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev": "node scripts/dev.js",
+    "build": "npm --prefix frontend run build",
+    "test": "npm --prefix backend test"
+  }
+}

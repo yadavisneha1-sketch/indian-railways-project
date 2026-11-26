@@ -10,9 +10,45 @@ dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 const rawProvider = (process.env.LLM_PROVIDER || 'auto').toLowerCase().trim();
 
+const DEFAULT_ALLOWED_ORIGINS = [
+  'http://localhost:5173',
+  'https://onrender.com',
+  'https://vercel.app',
+];
+
+const extraOrigins = (process.env.FRONTEND_ORIGIN || '')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+const allowedOrigins = Array.from(new Set([...DEFAULT_ALLOWED_ORIGINS, ...extraOrigins]));
+
+export function isOriginAllowed(origin) {
+  if (!origin) return true;
+  if (allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
+    return true;
+  }
+  try {
+    const { protocol, hostname } = new URL(origin);
+    if (
+      protocol === 'https:' &&
+      (hostname === 'onrender.com' ||
+        hostname.endsWith('.onrender.com') ||
+        hostname === 'vercel.app' ||
+        hostname.endsWith('.vercel.app'))
+    ) {
+      return true;
+    }
+  } catch {
+    return false;
+  }
+  return false;
+}
+
 export const env = {
   port: Number(process.env.PORT) || 5000,
   frontendOrigin: process.env.FRONTEND_ORIGIN || 'http://localhost:5173',
+  allowedOrigins,
   llmProvider: rawProvider,
   geminiApiKey: (process.env.GEMINI_API_KEY || '').trim(),
   geminiModel: (process.env.GEMINI_MODEL || 'gemini-2.5-flash').trim(),

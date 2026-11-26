@@ -99,4 +99,27 @@ describe('Express REST API & AI + MCP Integration', () => {
     assert.equal(callData.status, 'success');
     assert.equal(callData.result.station.code, 'HWH');
   });
+
+  it('allows CORS for onrender.com, vercel.app, and localhost:5173', async () => {
+    for (const origin of [
+      'https://onrender.com',
+      'https://railway-ai.onrender.com',
+      'https://vercel.app',
+      'https://railway-ai.vercel.app',
+      'http://localhost:5173',
+    ]) {
+      const res = await fetch(`${baseUrl}/api/health`, {
+        headers: { Origin: origin },
+      });
+      assert.equal(res.status, 200);
+      assert.equal(res.headers.get('access-control-allow-origin'), origin);
+    }
+  });
+
+  it('serves built frontend index.html for non-api routes', async () => {
+    const res = await fetch(`${baseUrl}/`);
+    assert.equal(res.status, 200);
+    const html = await res.text();
+    assert.match(html, /Railway AI Assistant/i);
+  });
 });
